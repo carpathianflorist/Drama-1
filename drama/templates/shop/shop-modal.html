@@ -1,0 +1,144 @@
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.14"></script>
+
+<div class="modal fade" id="itemModal" tabindex="-1" role="dialog" aria-labelledby="itemModalTitle" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-scrollable modal-dialog-centered" role="document">
+		<div class="modal-content">
+			<div class="modal-header px-4 py-3 align-items-center">
+				<!-- Product name -->
+				<div>
+					<div class="h4 text-uppercase mb-0">
+						Marsey
+					</div>
+					<div class="text-uppercase font-weight-light" style="letter-spacing: 1px;">
+						Frame
+					</div>
+				</div>
+				<!-- User balance -->
+				<div class="text-left">
+					<div style="letter-spacing: 1px;" class="text-primary text-small-extra text-uppercase font-weight-bold">
+						Your balance
+					</div>
+					<div class="font-weight-bold">
+						<i class="fas fa-diamond text-primary fa-sm mr-1"></i>
+						10000
+					</div>
+				</div>
+			</div>
+			<div id="itemModalBody" class="modal-body p-4">
+				<!-- Product details -->
+				<div v-if="loaded" id="item-body" class="pt-3">
+					<div class="text-center mb-3">
+						<!-- Product Image -->
+						<img class="img-fluid rounded w-md-50" src="..." alt="item-preview"/>
+					</div>
+					<!-- Product description -->
+					<p>
+						Your very own Marsey for your profile!
+					</p>
+					<hr>
+					<!-- Product quantity -->
+					<div>
+						<div style="letter-spacing: 1px;" class="text-muted text-small-extra text-uppercase font-weight-bold">
+							You Get
+						</div>
+						<div class="font-weight-bold mt-1">
+							<!-- Product icon -->
+							<img class="img-fluid" src="https://appstickers-cdn.appadvice.com/1153699096/818874475/0a5eb24ba3a6b19e3eac71f518af987d-8.png" alt="item-preview" style="width: 20px;height: 20px;object-fit: cover;">
+							<!-- Quantity -->
+							<span class="pl-1">x 1</span>
+						</div>
+					</div>
+				</div>
+				<!-- Error state -->
+				<div v-else-if="error" class="p-5 text-center">
+					<h4>Failed to fetch item</h4>
+					<button class="btn btn-primary">Retry</button>
+				</div>
+				<!-- Loading state -->
+				<div v-else class="p-5 text-center">
+					<h4>Loading...</h4>
+				</div>
+			</div>
+			<div class="d-flex align-items-center justify-content-end border-top px-3 py-4 shadow-lg">
+				<div class="mr-auto">
+					<!-- Disclaimer -->
+					<p class="text-small form-text text-white-50 my-0">
+						You cannot refund this item.
+					</p>
+				</div>
+				<!-- Confirmation button -->
+				<button type="submit" class="btn btn-primary bg-primary text-white mr-2" id="exileUserButton" disabled>
+					<i class="fas fa-diamond text-small fa-sm mr-1"></i>
+					100 Dramacoin
+				</button>
+				<!-- Cancel name -->
+				<button type="button" class="btn btn-link text-muted" data-dismiss="modal">Cancel</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<style>
+.items-wrapper input[type="radio"] {
+	display: none;
+}
+
+.items-wrapper label {
+	cursor: pointer;
+	padding: 15px;
+	text-align: center;
+	text-transform: none!important;
+}
+
+.items-wrapper label i {
+	font-size: 45px;
+}
+
+.items-wrapper label:hover {
+	/*background-color: rgba(173, 226, 255, 0.7)!important;*/
+	background-color: var(--primary)!important;
+	background-opacity: 0.4;
+}
+
+.items-wrapper input[type="radio"]:checked+label {
+	/*background-color: rgba(173, 226, 255, 0.9)!important;*/
+	background-color: var(--primary)!important;
+	background-opacity: 0.9;
+}
+
+.item-desc {
+	border-radius: 5px;
+	background-color: rgba(221, 221, 221, 0.23);
+	display: flex;
+}
+</style>
+
+<script>
+	new Vue({
+		el: "#itemModal",
+		delimiters: ['[[', ']]'],
+		data: {
+			loaded: false,
+			error: false,
+			items: [],
+			picked: null
+		},
+		computed: {
+			pickeditem: function() {
+				if (this.picked !== null) {
+					return this.items[this.picked];
+				} else {
+					return null;
+				}
+			}
+		},
+		mounted() {
+			fetch('/api/items')
+			.then(response => response.json())
+			.then(json => {
+				this.items = json;
+			});
+			this.loaded = true;
+		}
+	})
+</script>

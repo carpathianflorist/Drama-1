@@ -1,0 +1,103 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+	{% include "bootstrap.html" %}
+
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<meta name="description" content="">
+	<meta name="author" content="">
+
+	<link rel="icon" type="image/png" href="/assets/images/favicon.png">
+
+	<title>{% block pagetitle %}Shop- Drama{% endblock %}</title>
+		<meta property="og:type" content="article" />
+		<meta property="og:title" content="Drama" />
+		<meta property="og:site_name" content="rdrama.net" />
+		<meta property="og:image" content="{{'/assets/images/preview.png' | full_link}}" />
+		<meta property="og:url" content="https://rdrama.net">
+		<meta property="og:description" name="description" content="Dude bussy lmao">
+		<meta property="og:author" name="author" content="@drama" />
+		<meta property="og:site_name" content="rdrama.net" />
+
+		<meta name="twitter:card" content="summary_large_image"/>
+		<meta name="twitter:site" content="@drama">
+		<meta name="twitter:title" content="Drama" />
+		<meta name="twitter:creator" content="@drama">
+		<meta name="twitter:description" content="Dude bussy lmao" />
+		<meta name="twitter:image" content="{{'/assets/images/preview.png' | full_link}}" />
+		<meta name="twitter:url" content="https://rdrama.net" />
+	<link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600&display=swap" rel="stylesheet">
+
+	<!-- Bootstrap core CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+	integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+	<!-- Drama CSS -->
+
+	<link rel="stylesheet" href="/assets/style/{{v.theme}}_{{v.themecolor}}.css">
+	{% if v.agendaposter %}<link rel="stylesheet" href="/assets/style/agendaposter.css">{% elif v.css %}<link rel="stylesheet" href="/@{{v.username}}/css">{% endif %}
+
+	<!-- Font Awesome -->
+	<link href="/assets/style/fa.css" rel="stylesheet"> <!--load all styles -->
+
+	<script>
+		function formkey() {
+			return '{{v.formkey}}';
+		}
+	</script>
+</head>
+
+<body id="shop">
+
+    {% include "header.html" %}
+	{% include "shop/shop-nav.html" %}
+	<!-- Page Content -->
+	<div class="container">
+
+		<div class="row justify-content-around">
+
+	<div class="col h-100">
+
+	 {% block content %}
+	 {% endblock %}
+
+	</div>
+</div>
+
+
+ <!-- Clipboard Toast -->
+
+{% block clipboard %}
+<div class="toast clipboard" id="toast-success" role="alert" aria-live="assertive" aria-atomic="true" data-animation="true" data-autohide="true" data-delay="5000">
+	<div class="toast-body text-center">
+		<i class="fas fa-check-circle text-success mr-2"></i>Link copied to clipboard
+	</div>
+</div>
+
+<div class="toast clipboard" id="toast-error" role="alert" aria-live="assertive" aria-atomic="true" data-animation="true" data-autohide="true" data-delay="5000">
+	<div class="toast-body text-center">
+		<i class="fas fa-exclamation-circle text-danger mr-2"></i>Unable to copy link
+	</div>
+</div>
+{% endblock %}
+
+<!--Post toasts -->
+<div class="toast" id="toast-post-success" style="position: fixed; bottom: 1.5rem; margin: 0 auto; left: 0; right: 0; width: 275px; z-index: 1000" role="alert" aria-live="assertive" aria-atomic="true" data-animation="true" data-autohide="true" data-delay="5000">
+	<div class="toast-body bg-success text-center text-white">
+		<i class="fas fa-comment-alt-smile mr-2"></i><span id="toast-post-success-text"></span>
+	</div>
+</div>
+<div class="toast" id="toast-post-error" style="position: fixed; bottom: 1.5rem; margin: 0 auto; left: 0; right: 0; width: 275px; z-index: 1000" role="alert" aria-live="assertive" aria-atomic="true" data-animation="true" data-autohide="true" data-delay="5000">
+	<div class="toast-body bg-danger text-center text-white">
+		<i class="fas fa-exclamation-circle mr-2"></i><span id="toast-post-error-text"></span>
+	</div>
+</div>
+
+{% block onload %}{% endblock %}
+
+</body>
+
+</html>
