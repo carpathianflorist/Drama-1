@@ -1,4 +1,6 @@
-dramacache/
+image.png
+image.gif
+cache/
 __pycache__/
 *.py[cod]
 *$py.class

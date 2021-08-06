@@ -63,252 +63,6 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 --
--- Name: submissions; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.submissions (
-    id integer NOT NULL,
-    author_id integer,
-    created_utc integer NOT NULL,
-    is_banned boolean,
-    over_18 boolean,
-    distinguish_level integer,
-    created_str character varying(255),
-    stickied boolean,
-    deleted_utc integer NOT NULL,
-    domain_ref integer,
-    is_approved integer NOT NULL,
-    approved_utc integer,
-    edited_utc integer,
-    mod_approved integer,
-    has_thumb boolean,
-    accepted_utc integer,
-    post_public boolean,
-    score_hot double precision,
-    score_top integer,
-    score_activity double precision,
-    score_disputed double precision,
-    is_offensive boolean,
-    is_pinned boolean,
-    is_nsfl boolean,
-    repost_id integer,
-    score_best double precision,
-    upvotes integer,
-    downvotes integer,
-    app_id integer,
-    creation_region character(2) DEFAULT NULL::bpchar,
-    purged_utc integer DEFAULT 0,
-    is_bot boolean DEFAULT false,
-    thumburl text,
-    private boolean,
-    views integer,
-    banaward text
-);
-
-
-ALTER TABLE public.submissions OWNER TO postgres;
-
---
--- Name: comment_count(public.submissions); Type: FUNCTION; Schema: public; Owner: postgres
---
-
-CREATE FUNCTION public.comment_count(public.submissions) RETURNS bigint
-    LANGUAGE sql IMMUTABLE STRICT
-    AS $_$
-
-      SELECT COUNT(*)
-
-      FROM comments
-
-      WHERE is_banned=false
-
-        AND deleted_utc=0
-
-        AND parent_submission = $1.id
-
-        AND shadowbanned = false
-
-      $_$;
-
-
-ALTER FUNCTION public.comment_count(public.submissions) OWNER TO postgres;
-
---
--- Name: notifications; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.notifications (
-    id integer NOT NULL,
-    user_id integer,
-    comment_id integer,
-    read boolean NOT NULL,
-    followsender integer,
-    unfollowsender integer,
-    blocksender integer,
-    unblocksender integer
-);
-
-
-ALTER TABLE public.notifications OWNER TO postgres;
-
---
--- Name: created_utc(public.notifications); Type: FUNCTION; Schema: public; Owner: postgres
---
-
-CREATE FUNCTION public.created_utc(public.notifications) RETURNS integer
-    LANGUAGE sql IMMUTABLE STRICT
-    AS $_$
-select created_utc from comments
-where comments.id=$1.comment_id
-$_$;
-
-
-ALTER FUNCTION public.created_utc(public.notifications) OWNER TO postgres;
-
---
--- Name: users; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.users (
-    id integer NOT NULL,
-    username character varying(255) NOT NULL,
-    email character varying(255),
-    passhash character varying(255) NOT NULL,
-    created_utc integer NOT NULL,
-    admin_level integer,
-    over_18 boolean,
-    is_activated boolean,
-    bio character varying(300),
-    bio_html character varying(1000),
-    referred_by integer,
-    is_banned integer,
-    ban_reason character varying(128),
-    login_nonce integer,
-    reserved character varying(256),
-    mfa_secret character varying(32),
-    is_private boolean,
-    unban_utc integer,
-    is_nofollow boolean DEFAULT false,
-    custom_filter_list character varying(1000) DEFAULT ''::character varying,
-    discord_id character varying(64),
-    stored_subscriber_count integer DEFAULT 0,
-    ban_evade integer DEFAULT 0,
-    original_username character varying(255),
-    customtitle text,
-    defaultsorting text,
-    defaulttime text,
-    namecolor text,
-    titlecolor text,
-    profileurl text,
-    bannerurl text,
-    hidevotedon boolean,
-    newtab boolean,
-    flairchanged boolean,
-    defaultsortingcomments text,
-    theme text,
-    song text,
-    slurreplacer boolean,
-    shadowbanned boolean,
-    newtabexternal boolean,
-    customtitleplain text,
-    themecolor text,
-    changelogsub boolean,
-    oldreddit boolean,
-    css text,
-    profilecss text,
-    dramacoins integer,
-    agendaposter boolean,
-    agendaposter_expires_utc integer DEFAULT 0,
-    resized boolean,
-    banawards integer,
-    patron boolean,
-    animatedname boolean,
-    suicide_utc integer,
-    post_count integer,
-    comment_count integer,
-    highres text,
-    rent_utc integer
-);
-
-
-ALTER TABLE public.users OWNER TO postgres;
-
---
--- Name: referral_count(public.users); Type: FUNCTION; Schema: public; Owner: postgres
---
-
-CREATE FUNCTION public.referral_count(public.users) RETURNS bigint
-    LANGUAGE sql IMMUTABLE STRICT
-    AS $_$
-        SELECT COUNT(*)
-        FROM USERS
-        WHERE users.is_banned=0
-        AND users.referred_by=$1.id
-    $_$;
-
-
-ALTER FUNCTION public.referral_count(public.users) OWNER TO postgres;
-
---
--- Name: comments; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.comments (
-    id integer NOT NULL,
-    author_id integer,
-    created_utc integer NOT NULL,
-    parent_submission integer,
-    is_banned boolean,
-    parent_fullname character varying(255),
-    distinguish_level integer,
-    edited_utc integer,
-    deleted_utc integer NOT NULL,
-    is_approved integer NOT NULL,
-    author_name character varying(64),
-    approved_utc integer,
-    level integer,
-    parent_comment_id integer,
-    over_18 boolean,
-    upvotes integer,
-    downvotes integer,
-    is_bot boolean DEFAULT false,
-    is_pinned boolean DEFAULT false,
-    app_id integer,
-    sentto integer,
-    shadowbanned boolean,
-    banaward text
-);
-
-
-ALTER TABLE public.comments OWNER TO postgres;
-
---
--- Name: score(public.comments); Type: FUNCTION; Schema: public; Owner: postgres
---
-
-CREATE FUNCTION public.score(public.comments) RETURNS integer
-    LANGUAGE sql IMMUTABLE STRICT
-    AS $_$
-      SELECT ($1.upvotes - $1.downvotes)
-      $_$;
-
-
-ALTER FUNCTION public.score(public.comments) OWNER TO postgres;
-
---
--- Name: score(public.submissions); Type: FUNCTION; Schema: public; Owner: postgres
---
-
-CREATE FUNCTION public.score(public.submissions) RETURNS integer
-    LANGUAGE sql IMMUTABLE STRICT
-    AS $_$
-      SELECT ($1.upvotes - $1.downvotes)
-      $_$;
-
-
-ALTER FUNCTION public.score(public.submissions) OWNER TO postgres;
-
---
 -- Name: alts; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -429,8 +183,7 @@ CREATE TABLE public.badges (
     badge_id integer,
     user_id integer,
     description character varying(256),
-    url character varying(256),
-    created_utc integer
+    url character varying(256)
 );
 
 
@@ -464,7 +217,7 @@ ALTER SEQUENCE public.badges_id_seq OWNED BY public.badges.id;
 
 CREATE TABLE public.badlinks (
     id integer NOT NULL,
-    reason integer,
+    reason text,
     link character varying(512),
     autoban boolean
 );
@@ -532,6 +285,19 @@ ALTER SEQUENCE public.badpics_id_seq OWNED BY public.badpics.id;
 
 
 --
+-- Name: banneddomains; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.banneddomains (
+    id integer NOT NULL,
+    domain character varying(100),
+    reason text
+);
+
+
+ALTER TABLE public.banneddomains OWNER TO postgres;
+
+--
 -- Name: client_auths; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -539,17 +305,8 @@ CREATE TABLE public.client_auths (
     id integer NOT NULL,
     user_id integer,
     oauth_client integer,
-    scope_identity boolean,
-    scope_create boolean,
-    scope_read boolean,
-    scope_update boolean,
-    scope_delete boolean,
-    scope_vote boolean,
     scope_guildmaster boolean,
-    access_token character(128),
-    refresh_token character(128),
-    oauth_code character(128),
-    access_token_expire_utc integer
+    access_token character(128)
 );
 
 
@@ -585,7 +342,6 @@ CREATE TABLE public.commentflags (
     id integer NOT NULL,
     user_id integer,
     comment_id integer,
-    created_utc integer NOT NULL,
     reason text
 );
 
@@ -613,6 +369,37 @@ ALTER TABLE public.commentflags_id_seq OWNER TO postgres;
 
 ALTER SEQUENCE public.commentflags_id_seq OWNED BY public.commentflags.id;
 
+
+--
+-- Name: comments; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.comments (
+    id integer NOT NULL,
+    author_id integer,
+    created_utc integer NOT NULL,
+    parent_submission integer,
+    is_banned boolean,
+    distinguish_level integer,
+    edited_utc integer,
+    deleted_utc integer NOT NULL,
+    is_approved integer NOT NULL,
+    author_name character varying(64),
+    approved_utc integer,
+    level integer,
+    parent_comment_id integer,
+    over_18 boolean,
+    upvotes integer,
+    downvotes integer,
+    is_bot boolean DEFAULT false,
+    is_pinned boolean DEFAULT false,
+    app_id integer,
+    sentto integer,
+    shadowbanned boolean
+);
+
+
+ALTER TABLE public.comments OWNER TO postgres;
 
 --
 -- Name: comments_aux; Type: TABLE; Schema: public; Owner: postgres
@@ -712,24 +499,6 @@ ALTER SEQUENCE public.commentvotes_id_seq OWNED BY public.commentvotes.id;
 
 
 --
--- Name: domains; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.domains (
-    id integer NOT NULL,
-    domain character varying(100),
-    can_submit boolean,
-    can_comment boolean,
-    reason integer,
-    embed_function character varying(64),
-    embed_template character varying(32) DEFAULT NULL::character varying,
-    sandbox_embed boolean DEFAULT false
-);
-
-
-ALTER TABLE public.domains OWNER TO postgres;
-
---
 -- Name: domains_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -748,7 +517,7 @@ ALTER TABLE public.domains_id_seq OWNER TO postgres;
 -- Name: domains_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
-ALTER SEQUENCE public.domains_id_seq OWNED BY public.domains.id;
+ALTER SEQUENCE public.domains_id_seq OWNED BY public.banneddomains.id;
 
 
 --
@@ -759,7 +528,6 @@ CREATE TABLE public.flags (
     id integer NOT NULL,
     user_id integer,
     post_id integer,
-    created_utc integer NOT NULL,
     reason text
 );
 
@@ -795,8 +563,7 @@ ALTER SEQUENCE public.flags_id_seq OWNED BY public.flags.id;
 CREATE TABLE public.follows (
     id integer NOT NULL,
     user_id integer,
-    target_id integer,
-    created_utc integer
+    target_id integer
 );
 
 
@@ -873,7 +640,7 @@ CREATE TABLE public.modactions (
     target_comment_id integer,
     created_utc integer DEFAULT 0,
     kind character varying(32) DEFAULT NULL::character varying,
-    _note character varying(350) DEFAULT NULL::character varying
+    _note text DEFAULT NULL::character varying
 );
 
 
@@ -900,6 +667,24 @@ ALTER TABLE public.modactions_id_seq OWNER TO postgres;
 
 ALTER SEQUENCE public.modactions_id_seq OWNED BY public.modactions.id;
 
+
+--
+-- Name: notifications; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.notifications (
+    id integer NOT NULL,
+    user_id integer,
+    comment_id integer,
+    read boolean NOT NULL,
+    followsender integer,
+    unfollowsender integer,
+    blocksender integer,
+    unblocksender integer
+);
+
+
+ALTER TABLE public.notifications OWNER TO postgres;
 
 --
 -- Name: notifications_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
@@ -930,11 +715,9 @@ ALTER SEQUENCE public.notifications_id_seq OWNED BY public.notifications.id;
 CREATE TABLE public.oauth_apps (
     id integer NOT NULL,
     client_id character(64),
-    client_secret character(128),
     app_name character varying(50),
     redirect_uri character varying(4096),
     author_id integer,
-    is_banned boolean,
     description character varying(256)
 );
 
@@ -1000,6 +783,36 @@ ALTER SEQUENCE public.save_relationship_id_seq OWNED BY public.save_relationship
 
 
 --
+-- Name: submissions; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.submissions (
+    id integer NOT NULL,
+    author_id integer,
+    created_utc integer NOT NULL,
+    is_banned boolean,
+    over_18 boolean,
+    distinguish_level integer,
+    created_str character varying(255),
+    stickied boolean,
+    deleted_utc integer NOT NULL,
+    domain_ref integer,
+    is_approved integer NOT NULL,
+    edited_utc integer,
+    is_pinned boolean,
+    upvotes integer,
+    downvotes integer,
+    app_id integer,
+    thumburl text,
+    private boolean,
+    views integer,
+    is_bot boolean
+);
+
+
+ALTER TABLE public.submissions OWNER TO postgres;
+
+--
 -- Name: submissions_aux; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1012,8 +825,6 @@ CREATE TABLE public.submissions_aux (
     embed_url character varying(10000),
     ban_reason character varying(128),
     key_id integer NOT NULL,
-    meta_title character varying(512),
-    meta_description character varying(1024),
     title_html text
 );
 
@@ -1072,8 +883,6 @@ CREATE TABLE public.subscriptions (
     id integer NOT NULL,
     user_id integer,
     board_id integer,
-    created_utc integer NOT NULL,
-    is_active boolean,
     submission_id integer
 );
 
@@ -1147,8 +956,7 @@ ALTER SEQUENCE public.useragents_id_seq OWNED BY public.useragents.id;
 CREATE TABLE public.userblocks (
     id integer NOT NULL,
     user_id integer,
-    target_id integer,
-    created_utc integer
+    target_id integer
 );
 
 
@@ -1175,6 +983,74 @@ ALTER TABLE public.userblocks_id_seq OWNER TO postgres;
 
 ALTER SEQUENCE public.userblocks_id_seq OWNED BY public.userblocks.id;
 
+
+--
+-- Name: users; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.users (
+    id integer NOT NULL,
+    username character varying(255) NOT NULL,
+    email character varying(255),
+    passhash character varying(255) NOT NULL,
+    created_utc integer NOT NULL,
+    admin_level integer,
+    over_18 boolean,
+    is_activated boolean,
+    bio character varying(1500),
+    bio_html character varying(10000),
+    referred_by integer,
+    is_banned integer,
+    ban_reason character varying(128),
+    login_nonce integer,
+    reserved character varying(256),
+    mfa_secret character varying(32),
+    is_private boolean,
+    unban_utc integer,
+    is_nofollow boolean DEFAULT false,
+    custom_filter_list character varying(1000) DEFAULT ''::character varying,
+    discord_id character varying(64),
+    stored_subscriber_count integer DEFAULT 0,
+    ban_evade integer DEFAULT 0,
+    original_username character varying(255),
+    customtitle text,
+    defaultsorting text,
+    defaulttime text,
+    namecolor text,
+    titlecolor text,
+    profileurl text,
+    bannerurl text,
+    hidevotedon boolean,
+    newtab boolean,
+    flairchanged boolean,
+    defaultsortingcomments text,
+    theme text,
+    song text,
+    slurreplacer boolean,
+    shadowbanned boolean,
+    newtabexternal boolean,
+    customtitleplain text,
+    themecolor text,
+    changelogsub boolean,
+    oldreddit boolean,
+    css text,
+    profilecss text,
+    coins integer,
+    agendaposter boolean,
+    agendaposter_expires_utc integer DEFAULT 0,
+    resized boolean,
+    animatedname boolean,
+    suicide_utc integer,
+    post_count integer,
+    comment_count integer,
+    highres text,
+    rent_utc integer,
+    patron integer,
+    zzz boolean DEFAULT false
+);
+
+
+ALTER TABLE public.users OWNER TO postgres;
 
 --
 -- Name: users_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
@@ -1315,6 +1191,13 @@ ALTER TABLE ONLY public.badpics ALTER COLUMN id SET DEFAULT nextval('public.badp
 
 
 --
+-- Name: banneddomains id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.banneddomains ALTER COLUMN id SET DEFAULT nextval('public.domains_id_seq'::regclass);
+
+
+--
 -- Name: client_auths id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -1347,13 +1230,6 @@ ALTER TABLE ONLY public.comments_aux ALTER COLUMN key_id SET DEFAULT nextval('pu
 --
 
 ALTER TABLE ONLY public.commentvotes ALTER COLUMN id SET DEFAULT nextval('public.commentvotes_id_seq'::regclass);
-
-
---
--- Name: domains id; Type: DEFAULT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.domains ALTER COLUMN id SET DEFAULT nextval('public.domains_id_seq'::regclass);
 
 
 --
@@ -1566,18 +1442,18 @@ ALTER TABLE ONLY public.commentvotes
 
 
 --
--- Name: domains domains_domain_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: banneddomains domains_domain_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.domains
+ALTER TABLE ONLY public.banneddomains
     ADD CONSTRAINT domains_domain_key UNIQUE (domain);
 
 
 --
--- Name: domains domains_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: banneddomains domains_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.domains
+ALTER TABLE ONLY public.banneddomains
     ADD CONSTRAINT domains_pkey PRIMARY KEY (id);
 
 
@@ -1726,35 +1602,11 @@ ALTER TABLE ONLY public.client_auths
 
 
 --
--- Name: client_auths unique_code; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.client_auths
-    ADD CONSTRAINT unique_code UNIQUE (oauth_code);
-
-
---
 -- Name: oauth_apps unique_id; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.oauth_apps
     ADD CONSTRAINT unique_id UNIQUE (client_id);
-
-
---
--- Name: client_auths unique_refresh; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.client_auths
-    ADD CONSTRAINT unique_refresh UNIQUE (refresh_token);
-
-
---
--- Name: oauth_apps unique_secret; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.oauth_apps
-    ADD CONSTRAINT unique_secret UNIQUE (client_secret);
 
 
 --
@@ -1951,20 +1803,6 @@ CREATE INDEX cflag_user_idx ON public.commentflags USING btree (user_id);
 
 
 --
--- Name: client_access_token_idx; Type: INDEX; Schema: public; Owner: postgres
---
-
-CREATE INDEX client_access_token_idx ON public.client_auths USING btree (access_token, access_token_expire_utc);
-
-
---
--- Name: client_refresh_token_idx; Type: INDEX; Schema: public; Owner: postgres
---
-
-CREATE INDEX client_refresh_token_idx ON public.client_auths USING btree (refresh_token);
-
-
---
 -- Name: comment_body_idx; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -2066,7 +1904,7 @@ CREATE INDEX domain_ref_idx ON public.submissions USING btree (domain_ref);
 -- Name: domains_domain_trgm_idx; Type: INDEX; Schema: public; Owner: postgres
 --
 
-CREATE INDEX domains_domain_trgm_idx ON public.domains USING gin (domain public.gin_trgm_ops);
+CREATE INDEX domains_domain_trgm_idx ON public.banneddomains USING gin (domain public.gin_trgm_ops);
 
 
 --
@@ -2175,27 +2013,6 @@ CREATE INDEX post_author_index ON public.submissions USING btree (author_id);
 
 
 --
--- Name: post_offensive_index; Type: INDEX; Schema: public; Owner: postgres
---
-
-CREATE INDEX post_offensive_index ON public.submissions USING btree (is_offensive);
-
-
---
--- Name: post_public_idx; Type: INDEX; Schema: public; Owner: postgres
---
-
-CREATE INDEX post_public_idx ON public.submissions USING btree (post_public);
-
-
---
--- Name: sub_active_index; Type: INDEX; Schema: public; Owner: postgres
---
-
-CREATE INDEX sub_active_index ON public.subscriptions USING btree (is_active);
-
-
---
 -- Name: sub_user_index; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -2224,31 +2041,10 @@ CREATE INDEX submission_aux_url_trgm_idx ON public.submissions_aux USING gin (ur
 
 
 --
--- Name: submission_best_only_idx; Type: INDEX; Schema: public; Owner: postgres
---
-
-CREATE INDEX submission_best_only_idx ON public.submissions USING btree (score_best DESC);
-
-
---
--- Name: submission_disputed_sort_idx; Type: INDEX; Schema: public; Owner: postgres
---
-
-CREATE INDEX submission_disputed_sort_idx ON public.submissions USING btree (is_banned, deleted_utc, score_disputed DESC, over_18);
-
-
---
 -- Name: submission_domainref_index; Type: INDEX; Schema: public; Owner: postgres
 --
 
 CREATE INDEX submission_domainref_index ON public.submissions USING btree (domain_ref);
-
-
---
--- Name: submission_hot_sort_idx; Type: INDEX; Schema: public; Owner: postgres
---
-
-CREATE INDEX submission_hot_sort_idx ON public.submissions USING btree (is_banned, deleted_utc, score_hot DESC, over_18);
 
 
 --
@@ -2280,13 +2076,6 @@ CREATE INDEX submission_pinned_idx ON public.submissions USING btree (is_pinned)
 
 
 --
--- Name: submission_purge_idx; Type: INDEX; Schema: public; Owner: postgres
---
-
-CREATE INDEX submission_purge_idx ON public.submissions USING btree (purged_utc);
-
-
---
 -- Name: submissions_author_index; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -2315,24 +2104,10 @@ CREATE INDEX submissions_created_utc_desc_idx ON public.submissions USING btree 
 
 
 --
--- Name: submissions_offensive_index; Type: INDEX; Schema: public; Owner: postgres
---
-
-CREATE INDEX submissions_offensive_index ON public.submissions USING btree (is_offensive);
-
-
---
 -- Name: submissions_over18_index; Type: INDEX; Schema: public; Owner: postgres
 --
 
 CREATE INDEX submissions_over18_index ON public.submissions USING btree (over_18);
-
-
---
--- Name: submissions_score_idx; Type: INDEX; Schema: public; Owner: postgres
---
-
-CREATE INDEX submissions_score_idx ON public.submissions USING btree (score_top);
 
 
 --
@@ -2361,13 +2136,6 @@ CREATE INDEX subscription_board_index ON public.subscriptions USING btree (board
 --
 
 CREATE INDEX subscription_user_index ON public.subscriptions USING btree (user_id);
-
-
---
--- Name: trending_all_idx; Type: INDEX; Schema: public; Owner: postgres
---
-
-CREATE INDEX trending_all_idx ON public.submissions USING btree (is_banned, deleted_utc, stickied, post_public, score_hot DESC);
 
 
 --
