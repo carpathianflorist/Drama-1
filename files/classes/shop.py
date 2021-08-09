@@ -76,6 +76,13 @@ class ShopItemDef(Base):
         return self.age < self.created_utc+3*24*60*60
 
     @property
+    def cost(self):
+        if self.discount_price == 0 or self.discount_price >= self.price:
+            return self.price
+        else:
+            return self.discount_price
+
+    @property
     def json(self):
 
         return {
@@ -83,9 +90,8 @@ class ShopItemDef(Base):
             "name": self.name,
             "description": self.description,
             "icon": self.icon_url,
-            "price": self.price,
+            "cost": self.cost,
             "discount": self.discount_price > 0,
-            "discount_price": self.discount_price,
             "featured": self.featured,
             "new": self.new,
             "category_name": self.category.name
@@ -105,7 +111,7 @@ class ShopItem(Base):
 
     @property
     def json(self):
-        
+
         return {
             "id": self.id,
             "item_id": self.item.id,

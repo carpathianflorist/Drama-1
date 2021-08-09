@@ -26,3 +26,31 @@ def shop_items_get():
     queer = g.db.query(ShopCategory).all()
 
     return jsonify([x.json for x in queer])
+
+
+@app.put("/api/items/mine/<iid>")
+@auth_required
+@validate_formkey
+def purchase_item(iid, v):
+
+    item = g.db.query(ShopItemDef).filter_by(id=iid).first()
+
+    if not item:
+        return jsonify({"error": "Invalid item"}), 404
+
+    if item.cost > v.coins:
+        return jsonify({"error": f"You need {item.cost - v.coins} more coins to buy this item."}), 403
+
+    new_item = ShopItem(
+        user_id=v.id,
+        item_id=item.id
+    )
+
+    g.db.add(new_item)
+
+    v.coins -= item.cost
+    v.coins_spent += item.cost
+
+    g.db.add(v)
+
+    return jsonify({"message": f"{item.name} purchased"}), 201

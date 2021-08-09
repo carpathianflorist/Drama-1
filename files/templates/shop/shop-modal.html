@@ -7,10 +7,10 @@
 				<!-- Product name -->
 				<div>
 					<div class="h4 text-uppercase mb-0">
-						Marsey
+						selected.name
 					</div>
 					<div class="text-uppercase font-weight-light" style="letter-spacing: 1px;">
-						Frame
+						selected.category_name
 					</div>
 				</div>
 				<!-- User balance -->
@@ -33,7 +33,7 @@
 					</div>
 					<!-- Product description -->
 					<p>
-						Your very own Marsey for your profile!
+						selected.description
 					</p>
 					<hr>
 					<!-- Product quantity -->
@@ -43,7 +43,7 @@
 						</div>
 						<div class="font-weight-bold mt-1">
 							<!-- Product icon -->
-							<img class="img-fluid" src="https://appstickers-cdn.appadvice.com/1153699096/818874475/0a5eb24ba3a6b19e3eac71f518af987d-8.png" alt="item-preview" style="width: 20px;height: 20px;object-fit: cover;">
+							<img class="img-fluid" :src="selected.icon" alt="item-preview" style="width: 20px;height: 20px;object-fit: cover;">
 							<!-- Quantity -->
 							<span class="pl-1">x 1</span>
 						</div>
@@ -63,14 +63,14 @@
 			<div class="d-flex align-items-center justify-content-end border-top px-3 py-4 shadow-lg">
 				<div class="mr-auto">
 					<!-- Disclaimer -->
-					<p class="text-small form-text text-white-50 my-0">
+					<p class="text-small form-text text-muted my-0">
 						You cannot refund this item.
 					</p>
 				</div>
 				<!-- Confirmation button -->
 				<button type="submit" class="btn btn-primary bg-primary text-white mr-2" id="exileUserButton" disabled>
 					<i class="fas fa-diamond text-small fa-sm mr-1"></i>
-					100 Dramacoin
+					selected.cost Dramacoin
 				</button>
 				<!-- Cancel name -->
 				<button type="button" class="btn btn-link text-muted" data-dismiss="modal">Cancel</button>
