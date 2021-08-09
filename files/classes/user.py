@@ -76,6 +76,7 @@ class User(Base, Stndrd, Age_times):
 	login_nonce = Column(Integer, default=0)
 	reserved = Column(String(256))
 	coins = Column(Integer, default=0)
+	coins_spent = Column(Integer, default=0)
 	mfa_secret = deferred(Column(String(16)))
 	is_private = Column(Boolean, default=False)
 	stored_subscriber_count = Column(Integer, default=0)
