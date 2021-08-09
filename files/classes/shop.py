@@ -39,7 +39,7 @@ class ShopCategory(Base):
 
 class ShopItemDef(Base):
 
-    __tablename__ = "shopitem_defs"
+    __tablename__ = "item_defs"
 
     id = Column(Integer, primary_key=True)
     name = Column(String(50))
@@ -89,4 +89,27 @@ class ShopItemDef(Base):
             "featured": self.featured,
             "new": self.new,
             "category_name": self.category.name
+        }
+
+
+class ShopItem(Base):
+
+    __tablename__ = "items"
+
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('users.id'))
+    item_id = Column(Integer, ForeignKey('item_defs.id'))
+
+    user = relationship("User", primaryjoin="ShopItem.user_id == User.id", uselist=False, lazy="joined")
+    item = relationship("ShopItemDef", primaryjoin="ShopItem.item_id == ShopItemDef.id", uselist=False, lazy="joined")
+
+    @property
+    def json(self):
+        
+        return {
+            "id": self.id,
+            "item_id": self.item.id,
+            "name": self.item.name,
+            "description": self.item.description,
+            "price": self.item.price
         }
