@@ -39,12 +39,12 @@ document.body.addEventListener('keydown', function(event) {
 
 		const emojis = [
 		{
-			type:'platy',
-			emojis: ['platyblush','platybruh','platycaveman','platycheer','platydown','platyeyes','platyheart','platylol','platymicdrop','platynooo','platysalute','platyseethe','platythumbsup','platywave']
-		},
-		{
 			type:'marsey',
 			emojis: ['marseyasian','marseyblm','marseyburger','marseydildo','marseyfacepalm','marseygrilling','marseyjanny','marseymermaid','marseyrentfree','marseyretard','marseysadcat','marseysick','marseysmug','marseytrain', 'marseysipping', 'marseyjamming','marseyangel','marseyblowkiss','marseycry','marseydead','marseyexcited','marseygift','marseyinabox','marseylaugh','marseylove','marseymad','marseyparty','marseyrain','marseyreading','marseyready','marseysad','marseyscarf','marseyshook','marseysleep','marseythumbsup','marseywave', 'marsey69', 'marseycomrade', 'marseyira', 'marseyisis', 'marseymerchant', 'marseynut', 'marseyreich', 'marseyglam', 'marseycowboy', 'marseypat', 'marseypanties', 'marseybingus', 'marseydepressed', 'marseygift']
+		},
+		{
+			type:'platy',
+			emojis: ['platyblush','platybruh','platycaveman','platycheer','platydown','platyeyes','platyheart','platylol','platymicdrop','platynooo','platysalute','platyseethe','platythumbsup','platywave']
 		},
 		{
 			type:'tay',
@@ -56,7 +56,7 @@ document.body.addEventListener('keydown', function(event) {
 		},
 		{
 			type:'rage',
-			emojis: ['troll','bitchplease','cerealguypart2','challengeaccepted','contentiouscereal','cryingatcuteness','derp','derpcornsyrup','derpcrying','derpcute','derpdumb','derpeuphoria','derpinahd','derpinapokerface','derpinasnickering','derpprocessing','derprealization','derpsnickering','derptalking','derpthinking','derpthumbsup','derpunimpressed','derpwhy','donotwant','epicfacefeatures','fancywithwine','fffffffuuuuuuuuuuuu','flipthetable','foreveralone','foreveralonehappy','hewillnever','idontknow','interuptedreading','iseewhatyoudidthere','killherkillher','ledesire','leexcited','legenius','lelolidk','lemiddlefinger','lemindblown','leokay','lepanicrunning','lepokerface','lepokerface2','lerageface','leseriousface','likeaboss','lolface','longwhiskers','manymiddlefingers','megusta','motherfucker','motherofgod','mysides','ohgodwhy','pervertedspiderman','picard','ragestrangle','rukiddingme','tfwyougettrolled','trollolol','truestorybro','xallthey','yuno']
+			emojis: ['troll','bitchplease','spit','challengeaccepted','contentiouscereal','cryingatcuteness','derp','derpcornsyrup','derpcrying','derpcute','derpdumb','derpeuphoria','derpinahd','derpinapokerface','derpinasnickering','derpprocessing','derprealization','derpsnickering','derptalking','derpthinking','derpthumbsup','derpunimpressed','derpwhy','donotwant','epicfacefeatures','fancywithwine','fffffffuuuuuuuuuuuu','flipthetable','foreveralone','foreveralonehappy','hewillnever','idontknow','interuptedreading','iseewhatyoudidthere','killherkillher','ledesire','leexcited','legenius','lelolidk','lemiddlefinger','lemindblown','leokay','lepanicrunning','lepokerface','lepokerface2','lerageface','leseriousface','likeaboss','lolface','longwhiskers','manymiddlefingers','megusta','motherfucker','motherofgod','mysides','ohgodwhy','pervertedspiderman','picard','ragestrangle','rukiddingme','tfwyougettrolled','trollolol','truestorybro','xallthey','yuno']
 		},
 		{
 			type:'wojak',
@@ -261,10 +261,18 @@ function post(url, callback, errortext) {
 	xhr.send(form);
 };
 
-function post_toast(url, callback) {
+function post_toast(url, callback, data) {
 	var xhr = new XMLHttpRequest();
 	xhr.open("POST", url, true);
 	var form = new FormData()
+
+	if(typeof data === 'object' && data !== null) {
+		for(let k of Object.keys(data)) {
+				form.append(k, data[k]);
+		}
+	}
+
+
 	form.append("formkey", formkey());
 	xhr.withCredentials=true;
 
@@ -280,13 +288,20 @@ function post_toast(url, callback) {
 			} else if (xhr.status >= 300 && xhr.status < 400) {
 				window.location.href = JSON.parse(xhr.response)["redirect"]
 			} else {
-				data=JSON.parse(xhr.response);
-				
-				$('#toast-post-error').toast('dispose');
-				$('#toast-post-error').toast('show');
-				document.getElementById('toast-post-error-text').innerText = data["error"];
-				return false
-				
+				try {
+					data=JSON.parse(xhr.response);
+
+					$('#toast-post-error').toast('dispose');
+					$('#toast-post-error').toast('show');
+					document.getElementById('toast-post-error-text').innerText = data["error"];
+					return false
+				} catch(e) {
+					$('#toast-post-success').toast('dispose');
+					$('#toast-post-error').toast('dispose');
+					$('#toast-post-error').toast('show');
+					document.getElementById('toast-post-error-text').innerText = "Error. Try again later.";
+					return false
+				}
 			}
 		};
 

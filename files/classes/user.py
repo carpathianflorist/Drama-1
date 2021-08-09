@@ -58,14 +58,11 @@ class User(Base, Stndrd, Age_times):
 	submissions = relationship(
 		"Submission",
 		lazy="dynamic",
-		primaryjoin="Submission.author_id==User.id",
-		)
+		primaryjoin="Submission.author_id==User.id")
 	comments = relationship(
 		"Comment",
 		lazy="dynamic",
 		primaryjoin="Comment.author_id==User.id")
-	votes = relationship("Vote", lazy="dynamic")
-	commentvotes = relationship("CommentVote", lazy="dynamic")
 	bio = Column(String, default="")
 	bio_html = Column(String, default="")
 	badges = relationship("Badge", lazy="dynamic")
@@ -73,8 +70,8 @@ class User(Base, Stndrd, Age_times):
 		"Notification",
 		lazy="dynamic")
 
-	is_banned = Column(Integer, default=None)
-	unban_utc = Column(Integer, default=None)
+	is_banned = Column(Integer, default=0)
+	unban_utc = Column(Integer, default=0)
 	ban_reason = Column(String, default="")
 	login_nonce = Column(Integer, default=0)
 	reserved = Column(String(256))
@@ -103,11 +100,6 @@ class User(Base, Stndrd, Age_times):
 
 	_applications = relationship("OauthApp", lazy="dynamic")
 	authorizations = relationship("ClientAuth", lazy="dynamic")
-
-	saved_posts = relationship(
-		"SaveRelationship",
-		lazy="dynamic",
-		primaryjoin="User.id==SaveRelationship.user_id")
 
 	awards = relationship(
 		"AwardRelationship",

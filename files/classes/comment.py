@@ -52,11 +52,6 @@ class Comment(Base, Age_times, Scores, Stndrd, Fuzzing):
 
 	post = relationship("Submission")
 	flags = relationship("CommentFlag", lazy="dynamic")
-	votes = relationship(
-		"CommentVote",
-		lazy="dynamic",
-		primaryjoin="CommentVote.comment_id==Comment.id")
-
 	author = relationship(
 		"User",
 		lazy="joined",
@@ -97,9 +92,6 @@ class Comment(Base, Age_times, Scores, Stndrd, Fuzzing):
 	def score_disputed(self):
 		return (self.upvotes+1) * (self.downvotes+1)
 
-	def children(self, v):
-		return sorted([x for x in self.child_comments if not x.author.shadowbanned or (v and v.id == x.author_id)], key=lambda x: x.score, reverse=True)
-
 	@property
 	@lazy
 	def parent(self):
@@ -121,7 +113,7 @@ class Comment(Base, Age_times, Scores, Stndrd, Fuzzing):
 	def replies(self):
 
 		r = self.__dict__.get("replies", None)
-		if not r: r = self.child_comments
+		if not r and r != []: r = sorted([x for x in self.child_comments], key=lambda x: x.score, reverse=True)
 		return r
 
 	@replies.setter
@@ -223,10 +215,6 @@ class Comment(Base, Age_times, Scores, Stndrd, Fuzzing):
 		return data
 
 	@property
-	def voted(self):
-		return self.__dict__.get("_voted")
-
-	@property
 	def is_blocking(self):
 		return self.__dict__.get('_is_blocking', 0)
 
@@ -320,7 +308,3 @@ class Notification(Base):
 	def __repr__(self):
 
 		return f"<Notification(id={self.id})>"
-
-	@property
-	def voted(self):
-		return 0

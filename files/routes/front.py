@@ -34,14 +34,15 @@ def notifications(v):
 		cids = v.notification_commentlisting(page=page, all_=all_)
 		next_exists = (len(cids) == 26)
 		cids = cids[:25]
-		comments = get_comments(cids, v=v)
+		comments = get_comments(cids, v=v, load_parent=True)
 
 	listing = []
 	for c in comments:
 		c._is_blocked = False
 		c._is_blocking = False
 		if c.parent_submission and c.parent_comment and c.parent_comment.author_id == v.id:
-			while c.parent_comment:
+			c.replies = []
+			while c.parent_comment and c.parent_comment.author_id == v.id:
 				parent = c.parent_comment
 				if c not in parent.replies2:
 					parent.replies2 = parent.replies2 + [c]
@@ -50,8 +51,10 @@ def notifications(v):
 			if c not in listing:
 				listing.append(c)
 				c.replies = c.replies2
-		elif c.parent_submission and c not in listing:
-			listing.append(c)
+		elif c.parent_submission:
+			c.replies = []
+			if c not in listing:
+				listing.append(c)
 		else:
 			if c.parent_comment:
 				while c.level > 1:
@@ -141,7 +144,7 @@ def frontlist(v=None, sort="hot", page=1,t="all", ids_only=True, filter_words=''
 	secondrange = firstrange+1000
 	posts = posts[firstrange:secondrange]
 
-	if v and v.hidevotedon: posts = [x for x in posts if x.voted == 0]
+	if v and v.hidevotedon: posts = [x for x in posts if not (hasattr(x, 'voted') and x.voted != 0)]
 
 	if page == 1: posts = g.db.query(Submission).filter_by(stickied=True).all() + posts
 

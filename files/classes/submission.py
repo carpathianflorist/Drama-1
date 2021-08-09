@@ -149,7 +149,7 @@ class Submission(Base, Stndrd, Age_times, Scores, Fuzzing):
 		# load and tree comments
 		# calling this function with a comment object will do a comment
 		# permalink thing
-		if "replies" not in self.__dict__ and "_preloaded_comments" in self.__dict__:
+		if "replies" not in self.__dict__ and "preloaded_comments" in self.__dict__:
 			self.tree_comments(comment=comment)
 
 		return render_template(template,
@@ -172,7 +172,7 @@ class Submission(Base, Stndrd, Age_times, Scores, Fuzzing):
 
 	def tree_comments(self, comment=None, v=None):
 
-		comments = self.__dict__.get('_preloaded_comments',[])
+		comments = self.__dict__.get('preloaded_comments',[])
 		if not comments:
 			return
 
@@ -236,9 +236,7 @@ class Submission(Base, Stndrd, Age_times, Scores, Fuzzing):
 				'stickied': self.stickied,
 				'distinguish_level': self.distinguish_level,
 				#'award_count': self.award_count,
-				'meta_title': self.meta_title,
-				'meta_description': self.meta_description,
-				'voted': self.voted,
+				'voted': self.voted if hasattr(self, 'voted') else 0,
 				'flags': flags,
 				}
 
@@ -283,17 +281,13 @@ class Submission(Base, Stndrd, Age_times, Scores, Fuzzing):
 		if "replies" in self.__dict__:
 			data["replies"]=[x.json_core for x in self.replies]
 
-		if "_voted" in self.__dict__:
-			data["voted"] = self._voted
+		if "voted" in self.__dict__:
+			data["voted"] = self.voted
 
 		return data
 
 	def has_award(self, kind):
 		return bool(len([x for x in self.awards if x.kind == kind]))
-
-	@property
-	def voted(self):
-		return self._voted if "_voted" in self.__dict__ else 0
 
 	@property
 	def title(self):
@@ -376,24 +370,6 @@ class Submission(Base, Stndrd, Age_times, Scores, Fuzzing):
 	@embed_url.setter
 	def embed_url(self, x):
 		self.submission_aux.embed_url = x
-		g.db.add(self.submission_aux)
-
-	@property
-	def meta_title(self):
-		return self.submission_aux.meta_title
-
-	@meta_title.setter
-	def meta_title(self, x):
-		self.submission_aux.meta_title=x
-		g.db.add(self.submission_aux)
-
-	@property
-	def meta_description(self):
-		return self.submission_aux.meta_description
-
-	@meta_description.setter
-	def meta_description(self, x):
-		self.submission_aux.meta_description=x
 		g.db.add(self.submission_aux)
 	
 	@property

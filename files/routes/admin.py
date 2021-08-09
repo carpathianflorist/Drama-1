@@ -246,42 +246,6 @@ def users_list(v):
 						   page=page,
 						   )
 
-
-@app.get("/admin/content_stats")
-@admin_level_required(2)
-def participation_stats(v):
-
-	now = int(time.time())
-
-	day = now - 86400
-
-	data = {"valid_users": g.db.query(User).count(),
-			"private_users": g.db.query(User).filter_by(is_private=True).count(),
-			"banned_users": g.db.query(User).filter(User.is_banned > 0).count(),
-			"verified_email_users": g.db.query(User).filter_by(is_activated=True).count(),
-			"signups_last_24h": g.db.query(User).filter(User.created_utc > day).count(),
-			"total_posts": g.db.query(Submission).count(),
-			"posting_users": g.db.query(Submission.author_id).distinct().count(),
-			"listed_posts": g.db.query(Submission).filter_by(is_banned=False).filter(Submission.deleted_utc == 0).count(),
-			"removed_posts": g.db.query(Submission).filter_by(is_banned=True).count(),
-			"deleted_posts": g.db.query(Submission).filter(Submission.deleted_utc > 0).count(),
-			"posts_last_24h": g.db.query(Submission).filter(Submission.created_utc > day).count(),
-			"total_comments": g.db.query(Comment).count(),
-			"commenting_users": g.db.query(Comment.author_id).distinct().count(),
-			"removed_comments": g.db.query(Comment).filter_by(is_banned=True).count(),
-			"deleted_comments": g.db.query(Comment).filter(Comment.deleted_utc>0).count(),
-			"comments_last_24h": g.db.query(Comment).filter(Comment.created_utc > day).count(),
-			"post_votes": g.db.query(Vote).count(),
-			"post_voting_users": g.db.query(Vote.user_id).distinct().count(),
-			"comment_votes": g.db.query(CommentVote).count(),
-			"comment_voting_users": g.db.query(CommentVote.user_id).distinct().count(),
-			"total_awards": g.db.query(AwardRelationship).count(),
-			"awards_given": g.db.query(AwardRelationship).filter(or_(AwardRelationship.submission_id != None, AwardRelationship.comment_id != None)).count()
-			}
-
-
-	return render_template("admin/content_stats.html", v=v, title="Content Statistics", data=data)
-
 @app.get("/admin/alt_votes")
 @admin_level_required(4)
 def alt_votes_get(v):
@@ -1004,7 +968,7 @@ def admin_nunuke_user(v):
 
 	return redirect(user.url)
 	
-@app.get("/user_stat_data")
+@app.get("/admin/user_stat_data")
 @admin_level_required(2)
 @cache.memoize(timeout=60)
 def user_stat_data(v):
@@ -1032,9 +996,7 @@ def user_stat_data(v):
 	daily_signups = [{"date": time.strftime("%d", time.gmtime(day_cutoffs[i + 1])),
 					  "day_start":day_cutoffs[i + 1],
 					  "signups": g.db.query(User).filter(User.created_utc < day_cutoffs[i],
-														 User.created_utc > day_cutoffs[i + 1],
-														 User.is_banned == 0
-														 ).count()
+														 User.created_utc > day_cutoffs[i + 1]														 ).count()
 					  } for i in range(len(day_cutoffs) - 1)
 					 ]
 
@@ -1085,10 +1047,10 @@ def create_plot(**kwargs):
 		return abort(400)
 
 	# create multiple charts
-	daily_signups = [d["signups"] for d in kwargs["sign_ups"]['daily_signups']][::-1]
-	post_stats = [d["posts"] for d in kwargs["posts"]['post_stats']][::-1]
-	comment_stats = [d["comments"] for d in kwargs["comments"]['comment_stats']][::-1]
-	daily_times = [d["date"] for d in kwargs["sign_ups"]['daily_signups']]
+	daily_signups = [d["signups"] for d in kwargs["sign_ups"]['daily_signups']][1:][::-1]
+	post_stats = [d["posts"] for d in kwargs["posts"]['post_stats']][1:][::-1]
+	comment_stats = [d["comments"] for d in kwargs["comments"]['comment_stats']][1:][::-1]
+	daily_times = [d["date"] for d in kwargs["sign_ups"]['daily_signups']][1:][::-1]
 
 	multi_plots = multiple_plots(sign_ups=daily_signups,
 								 posts=post_stats,
@@ -1108,15 +1070,15 @@ def multiple_plots(**kwargs):
 	signup_chart.grid(), posts_chart.grid(), comments_chart.grid()
 
 	signup_chart.plot(
-		kwargs['daily_times'][::-1],
+		kwargs['daily_times'],
 		kwargs['sign_ups'],
 		color='red')
 	posts_chart.plot(
-		kwargs['daily_times'][::-1],
+		kwargs['daily_times'],
 		kwargs['posts'],
 		color='green')
 	comments_chart.plot(
-		kwargs['daily_times'][::-1],
+		kwargs['daily_times'],
 		kwargs['comments'],
 		color='gold')
 

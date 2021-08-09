@@ -25,7 +25,7 @@
 <meta property="og:article:author" content="@{{u.username}}" />
 <meta property="article:section" content="{{u.username}}'s profile - {{"SITE_NAME" | app_config}}" />
 <meta property="article:published_time" content="{{u.created_date}}" />
-<meta property="og:description" name="description" content="{{u.coins}} {{"SITE_NAME" | app_config}}coins - Joined {{u.created_date}} - {% if u.stored_subscriber_count >=1 and not u.is_private and not u.is_nofollow %}{{u.stored_subscriber_count}} Followers - {% endif %}{% if not u.is_private %}{{u.post_count}} Posts - {{u.comment_count}} Comments - {% endif %}{{u.bio}}" />
+<meta property="og:description" name="description" content="{{u.coins}} {{"COINS_NAME" | app_config}} - Joined {{u.created_date}} - {% if u.stored_subscriber_count >=1 and not u.is_private and not u.is_nofollow %}{{u.stored_subscriber_count}} Followers - {% endif %}{% if not u.is_private %}{{u.post_count}} Posts - {{u.comment_count}} Comments - {% endif %}{{u.bio}}" />
 <meta property="og:author" name="author" content="@{{u.username}}" />
 <meta property="og:title" content="{{u.username}}" />
 <meta property="og:image" content="{% if u.bannerurl %}{{u.banner_url}}{% else %}{{'/assets/images/preview.png' | full_link}}{% endif %}" />
@@ -36,7 +36,7 @@
 <meta name="twitter:site" content="{{request.host_url}}">
 <meta name="twitter:title" content="{{u.username}}'s profile - {{"SITE_NAME" | app_config}}" />
 <meta name="twitter:creator" content="@{{u.username}}">
-<meta name="twitter:description" content="{{u.coins}} {{"SITE_NAME" | app_config}}coins - Joined {{u.created_date}} - {% if u.stored_subscriber_count >=1 and not u.is_private and not u.is_nofollow %}{{u.stored_subscriber_count}} Followers -{% endif %} {% if not u.is_private %} {{u.post_count}} Posts - {{u.comment_count}} Comments -{% endif %} {{u.bio}}" />
+<meta name="twitter:description" content="{{u.coins}} {{"COINS_NAME" | app_config}} - Joined {{u.created_date}} - {% if u.stored_subscriber_count >=1 and not u.is_private and not u.is_nofollow %}{{u.stored_subscriber_count}} Followers -{% endif %} {% if not u.is_private %} {{u.post_count}} Posts - {{u.comment_count}} Comments -{% endif %} {{u.bio}}" />
 <meta name="twitter:image" content="{% if u.bannerurl %}{{u.banner_url}}{% else %}{{'/assets/images/preview.png' | full_link}}{% endif %}" />
 <meta name="twitter:url" content="{{u.url | full_link}}" />
 {% endblock %}
@@ -53,6 +53,41 @@
 		document.getElementById('userpage').addEventListener('click', () => {
 			if (audio.paused) audio.play(); 
 		}, {once : true});
+	}
+
+	function transferCoins(mobile=false) {
+		let t = event.target;
+		t.disabled = true;
+
+		post_toast("/@{{ u.username }}/transfer_coins",
+			xhr => {
+				if(xhr.status == 200) {
+					fetch("/@{{ u.username }}/coins")
+						.then(r => r.json())
+						.then(m => {
+							document.getElementById("profile-coins-amount").innerText = m["coins"];
+							document.getElementById("profile-coins-amount-mobile").innerText = m["coins"];
+						})
+
+					fetch("/@{{ v.username }}/coins")
+						.then(r => r.json())
+						.then(m => document.getElementById(`user-coins-amount`).innerText = m["coins"])
+				}
+			},
+			{"amount": document.getElementById(mobile ? "coins-transfer-amount-mobile" : "coins-transfer-amount").value}
+		);
+
+		setTimeout(_ => t.disabled = false, 2000);
+	}
+
+	function toggleElement(group, id) {
+		for(let el of document.getElementsByClassName(group)) {
+			if(el.id != id) {
+				el.classList.add('d-none');
+			}
+		}
+
+		document.getElementById(id).classList.toggle('d-none');
 	}
 </script>
 <textarea id="userid" style="display: none;">{% if u.song %}{{u.id}}{% else %}nosong{% endif %}</textarea>
@@ -119,7 +154,8 @@
 				{% if u.customtitle %}<p class="font-weight-bolder" style="color: #{{u.titlecolor}}">{{u.customtitle | safe}}</p>{% endif %}
 				
 				<div class="font-weight-bolder">
-					<span>{{u.coins}}</span> {{"SITE_NAME" | app_config}}coins&nbsp;&nbsp; {% if u.stored_subscriber_count >=1 and not u.is_nofollow %}<a href="/@{{u.username}}/followers">{{u.stored_subscriber_count}} follower{{'s' if u.stored_subscriber_count != 1 else ''}}</a>&nbsp;&nbsp; {% endif %}joined <span data-toggle="tooltip" data-placement="bottom" title="" data-original-title="{{u.created_datetime}}">{{u.created_date}}</span>
+					<span id="profile-coins-amount">{{u.coins}}</span> {{"COINS_NAME" | app_config}}&nbsp;&nbsp; {% if u.stored_subscriber_count >=1 and not u.is_nofollow %}<a href="/@{{u.username}}/followers">{{u.stored_subscriber_count}} follower{{'s' if u.stored_subscriber_count != 1 else ''}}</a>&nbsp;&nbsp; {% endif %}joined <span data-toggle="tooltip" data-placement="bottom" title="" data-original-title="{{u.created_datetime}}">{{u.created_date}}</span>
+
 				</div>
 				{% if u.bio_html %}
 				<pre></pre>
@@ -136,9 +172,11 @@
 						<a id="button-unsub" class="btn btn-secondary {% if not is_following %}d-none{% endif %}" href="javascript:void(0)" onclick="post('/unfollow/{{u.username}}', callback=function(){document.getElementById('button-unsub').classList.toggle('d-none');document.getElementById('button-sub').classList.toggle('d-none');})">Unfollow</a>
 						<a id="button-sub" class="btn btn-primary {% if is_following or u.is_nofollow or u.is_blocked %}d-none{% endif %}" href="javascript:void(0)" onclick="post('/follow/{{u.username}}', callback=function(){document.getElementById('button-sub').classList.toggle('d-none');document.getElementById('button-unsub').classList.toggle('d-none');})">Follow</a>						
 						
-						<a class="btn btn-primary" href="javascript:void(0)" onclick="document.getElementById('message').classList.toggle('d-none')">Message</a>
+						<a class="btn btn-primary" href="javascript:void(0)" onclick="toggleElement('profile-toggleable', 'message')">Message</a>
+
 						<a class="btn btn-primary" href="javascript:void(0)" onclick="post('/@{{u.username}}/suicide', function(){window.location.reload(true);})">Get them help</a>
-						<form class="d-none" id="message" action="/@{{u.username}}/message" method="post">
+						<a class="btn btn-primary" href="javascript:void(0)" onclick="toggleElement('profile-toggleable', 'coin-transfer')">Gift {{"COINS_NAME" | app_config}}</a>
+						<form class="d-none profile-toggleable" id="message" action="/@{{u.username}}/message" method="post">
 							<pre></pre>
 							<textarea id="input-message" form="message" name="message" rows="3" class="form-control" required></textarea>
 							<pre></pre>
@@ -154,6 +192,11 @@
 							&nbsp;
 							<input type="submit" value="Submit" class="btn btn-primary mt-3">
 						</form>
+
+						<div class="d-none mt-3 profile-toggleable" id="coin-transfer">
+							<input id="coins-transfer-amount" class="form-control" name="amount" type="number">
+							<button class="btn btn-primary mt-3" onclick="transferCoins()">Gift</button>
+						</div>
 
 					 {% elif v and v.id == u.id %}
 						<a href="/settings/profile" class="btn btn-secondary">Edit profile</a>
@@ -301,12 +344,21 @@
 						<i class="fad fa-user-tag text-info align-middle ml-2" data-toggle="tooltip" data-placement="bottom" title="Original Username: @{{u.original_username}}"></i>
 					</span>
 				{% endif %}
+				{% if u.admin_level > 1 or (u.admin_level == 1 and (not v or v.admin_level < 2)) %}
+				<span>
+					<i class="fas fa-broom text-admin align-middle ml-2" data-toggle="tooltip" data-placement="bottom" title="Badmin"></i>
+				</span>
+				{% elif u.admin_level == 1 %}
+				<span>
+					<i class="fas fa-broom align-middle ml-2" data-toggle="tooltip" data-placement="bottom" title="Fake Admin"></i>
+				</span>
+				{% endif %}
 				{% if v and v.has_follower(u) and not v.is_nofollow %}
 					<span class="text-primary badge badge-secondary text-small align-middle mx-1">Follows you</span>
 				{% endif %}
 				{% if u.customtitle %}<p style="color: #{{u.titlecolor}}">{{u.customtitle | safe}}</p>{% endif %}
 				<div class="font-weight-normal">
-					<span class="font-weight-bold">{{u.coins}}</span> {{"SITE_NAME" | app_config}}coins&nbsp;&nbsp;{% if u.stored_subscriber_count >=1 and not u.is_nofollow %}<a href="/@{{u.username}}/followers" class="font-weight-bold">{{u.stored_subscriber_count}} follower{{'s' if u.stored_subscriber_count != 1 else ''}}</a>&nbsp;&nbsp; {% endif %}<br>joined <span data-toggle="tooltip" data-placement="bottom" title="" data-original-title="{{u.created_datetime}}" class="font-weight-bold">{{u.created_date}}</span>
+					<span id="profile-coins-amount-mobile" class="font-weight-bold">{{u.coins}}</span> {{"COINS_NAME" | app_config}}&nbsp;&nbsp;{% if u.stored_subscriber_count >=1 and not u.is_nofollow %}<a href="/@{{u.username}}/followers" class="font-weight-bold">{{u.stored_subscriber_count}} follower{{'s' if u.stored_subscriber_count != 1 else ''}}</a>&nbsp;&nbsp; {% endif %}<br>joined <span data-toggle="tooltip" data-placement="bottom" title="" data-original-title="{{u.created_datetime}}" class="font-weight-bold">{{u.created_date}}</span>
 				</div>
 				{% if u.bio_html %}
 				<p class="text-muted text-break">{{u.bio_html | safe}}</p>
@@ -328,9 +380,11 @@
 					<a id="button-unsub2" class="btn btn-secondary {% if not is_following %}d-none{% endif %}" href="javascript:void(0)" onclick="post('/unfollow/{{u.username}}', callback=function(){document.getElementById('button-unsub2').classList.toggle('d-none');document.getElementById('button-sub2').classList.toggle('d-none');})">Unfollow</a>
 					<a id="button-sub2" class="btn btn-primary {% if is_following or u.is_nofollow or u.is_blocked %}d-none{% endif %}" href="javascript:void(0)" onclick="post('/follow/{{u.username}}', callback=function(){document.getElementById('button-sub2').classList.toggle('d-none');document.getElementById('button-unsub2').classList.toggle('d-none');})">Follow</a>						
 					
-					<a class="btn btn-primary" href="javascript:void(0)" onclick="document.getElementById('message-mobile').classList.toggle('d-none')">Message</a>
+					<a class="btn btn-primary" href="javascript:void(0)" onclick="toggleElement('profile-toggleable-mobile', 'message-mobile')">Message</a>
 					<a class="btn btn-primary" href="javascript:void(0)" onclick="post('/@{{u.username}}/suicide', function(){window.location.reload(true);})">Get them help</a>
-					<form class="d-none" id='message-mobile' action="/@{{u.username}}/message" method="post">
+					<a class="btn btn-primary" href="javascript:void(0)" onclick="toggleElement('profile-toggleable-mobile', 'coin-transfer-mobile')">Gift {{"COINS_NAME" | app_config}}</a>
+
+					<form class="d-none profile-toggleable-mobile" id='message-mobile' action="/@{{u.username}}/message" method="post">
 						<pre></pre>
 						<textarea id="input-message-mobile" form="message-mobile" name="message" rows="3" class="form-control" required></textarea>
 						<pre></pre>
@@ -346,6 +400,11 @@
 						&nbsp;
 						<input type="submit" value="Submit" class="btn btn-primary mt-3">
 					</form>
+
+					<div class="d-none mt-3 profile-toggleable-mobile" id="coin-transfer-mobile">
+						<input id="coins-transfer-amount-mobile" class="form-control" name="amount" type="number">
+						<button class="btn btn-primary mt-3" onclick="transferCoins(true)">Gift</button>
+					</div>
 					
 					 {% if v.admin_level > 1 and u.admin_level <= 1 %}
 						<br><br>

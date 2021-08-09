@@ -1,6 +1,6 @@
 // Colors
 
-$primary: #c9d1d9;
+$primary: #ff66ac;
 $dark: #8b949e;
 $secondary: #8b949e;
 $danger: #da3633;
@@ -11,7 +11,7 @@ $success: #3fb950;
 $muted: #c9d1d9;
 $info: #168EEA;
 
-$purple: #a371f7;
+$purple: #ff66ac;
 $red: #da3633;
 $gray: #8b949e;
 $green: #3fb950;
@@ -21,12 +21,12 @@ $gray-200: #b1bac4;
 $gray-300: #8b949e;
 $gray-400: #6e7681;
 $gray-500: #484f58;
-$gray-600: #30363d;
+$gray-600: #21262d;
 $gray-700: #21262d;
 $gray-800: #161b22;
 $gray-900: #0d1117;
 
-$bg-dark: #090c10;
+$bg-dark: #21262d;
 
 $upvote: #ff66ac;
 $downvote: #38B2AC;
@@ -52,17 +52,11 @@ body {
 }
 
 .form-control {
-	border: 1px solid $gray-700 !important;
+	border-color: $gray-700 !important;
 }
 
 #frontpage .posts .card, #userpage .posts .card, #search .posts .card, #guild .posts .card, #settings-guild .posts .card {
-	margin-bottom: 1rem !important;
-	border: 1px solid $gray-600 !important;
-}
-
-* {
-    -webkit-animation: None !important;
-    animation: None !important;
+	border-color: $gray-600 !important;
 }
 
 // * {
