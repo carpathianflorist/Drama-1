@@ -60,13 +60,13 @@
 
 		<div class="row justify-content-around">
 
-	<div id="shop" class="col h-100">
+			<div id="shop" class="col h-100">
 
-	 {% block content %}
-	 {% endblock %}
+				{% block content %}
+				{% endblock %}
 
-	</div>
-</div>
+			</div>
+		</div>
 
 
  <!-- Clipboard Toast -->
@@ -103,12 +103,32 @@
 </div>
 
 <script>
+	var itemModal = new bootstrap.Modal(document.getElementById('itemModal'))
+
 	new Vue({
 		el: '#shop',
 		delimiters: ['[[', ']]'],
 		data: {
 			settings: false,
-		}
+			items: [],
+			loaded: false,
+			selected: {},
+		},
+		methods: {
+			pick(item) {
+				this.selected = {...item};
+				console.log(JSON.stringify(this.selected, null, 4));
+				itemModal.show();
+			}
+		},
+		mounted() {
+			fetch('/api/items/all')
+			.then(response => response.json())
+			.then(json => {
+				this.items = json;
+			});
+			this.loaded = true;
+		},
 	});
 </script>
 
