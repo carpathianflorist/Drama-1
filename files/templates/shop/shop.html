@@ -1,5 +1,6 @@
 {% extends "shop/shop-layout.html" %}
 {% block content %}
+
 <div class="container pt-5">
 	<div class="row">
 		<div class="col-3 d-none d-md-block">
@@ -33,6 +34,13 @@
 
 		<div class="col-md-9 mx-auto">
 
+			{% if v and v.admin_level == 6 %}
+			<div class="custom-control custom-switch">
+				<input type="checkbox" class="custom-control-input" id="toggle-settings" v-model="settings">
+				<label class="custom-control-label" for="toggle-settings">Show item settings</label>
+			</div>
+			{% endif %}
+
 			<!-- shop-header.html goes here -->
 			{% include "shop/shop-header.html" %}
 
@@ -48,4 +56,8 @@
 		</div>
 	</div>
 </div>
+{% endblock %}
+
+{% block thing %}
+{% include "shop/shop-modal.html" %}
 {% endblock %}
