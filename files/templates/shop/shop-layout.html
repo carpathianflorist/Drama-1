@@ -4,6 +4,7 @@
 <head>
 
 	{% include "bootstrap.html" %}
+	<script src="https://cdn.jsdelivr.net/npm/vue@2.6.14"></script>
 
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -12,7 +13,7 @@
 
 	<link rel="icon" type="image/png" href="/assets/images/favicon.png">
 
-	<title>{% block pagetitle %}Shop- Drama{% endblock %}</title>
+	<title>{% block pagetitle %}Shop - Drama{% endblock %}</title>
 		<meta property="og:type" content="article" />
 		<meta property="og:title" content="Drama" />
 		<meta property="og:site_name" content="rdrama.net" />
@@ -50,7 +51,7 @@
 	</script>
 </head>
 
-<body id="shop">
+<body>
 
     {% include "header.html" %}
 	{% include "shop/shop-nav.html" %}
@@ -59,7 +60,7 @@
 
 		<div class="row justify-content-around">
 
-	<div class="col h-100">
+	<div id="shop" class="col h-100">
 
 	 {% block content %}
 	 {% endblock %}
@@ -97,6 +98,25 @@
 </div>
 
 {% block onload %}{% endblock %}
+{% block thing %}{% endblock %}
+
+</div>
+
+<script>
+	new Vue({
+		el: '#shop',
+		delimiters: ['[[', ']]'],
+		data: {
+			settings: false,
+			modalOpen: false,
+		},
+		methods: {
+			test: function() {
+				alert('sex');
+			},
+		},
+	});
+</script>
 
 </body>
 
