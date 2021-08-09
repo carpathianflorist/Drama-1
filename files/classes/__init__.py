@@ -15,3 +15,4 @@ from .agents import *
 from .lolwtf import *
 from .mod_logs import *
 from .award import *
+from .shop import *
