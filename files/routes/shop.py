@@ -10,7 +10,7 @@ def shop_index(v):
     return render_template("shop/shop.html", v=v)
 
 
-@app.get("/api/items")
+@app.get("/api/items/all")
 def shop_items_get():
 
     cats_only = bool(int(request.args.get("cats_only", "0")))
