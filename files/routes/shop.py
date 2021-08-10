@@ -24,8 +24,23 @@ def shop_items_get():
         return jsonify([x.json_noitems for x in queer])
 
     queer = g.db.query(ShopCategory).all()
+    data = [x.json for x in queer]
 
-    return jsonify([x.json for x in queer])
+    # option to auto-add a featured section
+    if 'with_featured' in request.args:
+        queer2 = g.db.query(ShopItemDef).filter_by(featured=True).all()
+
+        featured = {
+            "id": 0,
+            "name": "New & Noteworthy",
+            "description": "These items are now being featured.",
+            "items": [x.json for x in queer2]
+        }
+
+        data.append(featured)
+        data = sorted(data, key=lambda x: x['id'])
+
+    return jsonify(data)
 
 
 @app.get("/api/items/featured")
