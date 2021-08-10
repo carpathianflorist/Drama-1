@@ -45,6 +45,11 @@
 			selected: {},
 		},
 		methods: {
+			feature(item) {
+				req = request_toast("PATCH", `/api/items/${item.id}/featured`, callback = function(xhr){});
+				// console.log(req);
+				item.featured = !item.featured;
+			},
 			pick(item) {
 				this.selected = {...item};
 				// lmao vue won't mount on larger scopes
