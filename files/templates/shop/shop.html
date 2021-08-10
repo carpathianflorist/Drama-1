@@ -32,7 +32,7 @@
 			</ul>
 		</div>
 
-		<div class="col-md-9 mx-auto">
+		<div id="shop" class="col-md-9 mx-auto">
 
 			{% if v and v.admin_level == 6 %}
 			<div class="custom-control custom-switch">
@@ -60,4 +60,44 @@
 
 {% block thing %}
 {% include "shop/shop-modal.html" %}
+{% endblock %}
+
+{% block vue %}
+<script>
+	var itemModal = new bootstrap.Modal(document.getElementById('itemModal'))
+
+	new Vue({
+		el: '#shop',
+		delimiters: ['[[', ']]'],
+		data: {
+			coins: {{ v.coins }},
+			settings: false,
+			items: [],
+			loaded: false,
+			selected: {},
+		},
+		methods: {
+			pick(item) {
+				this.selected = {...item};
+				// lmao vue won't mount on larger scopes
+				$("#item-modal-name").html(this.selected.name);
+				$("#item-modal-cat").html(this.selected.category_name);
+				$("#item-modal-desc").html(this.selected.description);
+				$("#item-modal-img").attr("src", this.selected.icon);
+				$("#item-modal-icon").attr("src", this.selected.icon);
+				$("#item-modal-cost").html(this.selected.cost);
+				$("#item-modal-submit").attr("onclick", `post_toast("/api/items/mine/${this.selected.id}")`);
+				itemModal.show();
+			}
+		},
+		mounted() {
+			fetch('/api/items/all')
+			.then(response => response.json())
+			.then(json => {
+				this.items = json;
+			});
+			this.loaded = true;
+		},
+	});
+</script>
 {% endblock %}
