@@ -28,7 +28,16 @@ def shop_items_get():
     return jsonify([x.json for x in queer])
 
 
-@app.put("/api/items/mine/<iid>")
+@app.get("/api/items/mine")
+@auth_required
+def items_mine(v):
+
+    queer = g.db.query(ShopItem).filter_by(user_id=v.id).all()
+
+    return jsonify([x.json for x in queer])
+
+
+@app.post("/api/items/mine/<iid>")
 @auth_required
 @validate_formkey
 def purchase_item(iid, v):
