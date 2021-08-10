@@ -28,6 +28,14 @@ def shop_items_get():
     return jsonify([x.json for x in queer])
 
 
+@app.get("/api/items/featured")
+def shop_items_featured():
+
+    queer = g.db.query(ShopItemDef).filter_by(featured=True).all()
+
+    return jsonify([x.json for x in queer])
+
+
 @app.get("/api/items/mine")
 @auth_required
 def items_mine(v):
@@ -63,3 +71,26 @@ def purchase_item(iid, v):
     g.db.add(v)
 
     return jsonify({"message": f"{item.name} purchased"}), 201
+
+
+# toggle featured status on item
+@app.patch("/api/items/<iid>/featured")
+@auth_required
+@validate_formkey
+def toggle_item_featured(iid, v):
+
+    if v.admin_level < 6:
+        return jsonify({"error": "Nice try retard"}), 403
+
+    item = g.db.query(ShopItemDef).filter_by(id=iid).first()
+
+    if not item:
+        return jsonify({"error": "You tried to feature an item that doesn't even exist. Please do better."}), 404
+
+    return_msg = f"{item.name} removed from featured" if item.featured else f"{item.name} is now featured"
+
+    item.featured = not item.featured
+
+    g.db.add(item)
+
+    return jsonify({"message": return_msg})
