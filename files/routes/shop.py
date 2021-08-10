@@ -10,6 +10,49 @@ def shop_index(v):
     return render_template("shop/shop.html", v=v)
 
 
+@app.get("/shop/edit/<iid>")
+@auth_required
+def get_shop_item_edit(iid, v):
+
+    if v.admin_level < 6:
+        abort(403)
+
+    item = g.db.query(ShopItemDef).filter_by(id=iid).first()
+
+    if not item:
+        abort(404)
+
+    cats = g.db.query(ShopCategory).options(lazyload('*')).all()
+
+    return render_template("shop/shop-edit.html", item=item, cats=cats, v=v)
+
+
+@app.post("/api/edit_item/<iid>")
+@auth_required
+def shop_item_edit(iid, v):
+
+    if v.admin_level < 6:
+        abort(403)
+
+    item = g.db.query(ShopItemDef).filter_by(id=iid).first()
+
+    if not item:
+        abort(404)
+
+    item.name = request.form.get("name", item.name).strip()
+    item.description = request.form.get("description", item.description).strip()
+    item.icon_url = request.form.get("icon-url", item.icon_url).strip()
+    item.price = int(request.form.get("price", item.price))
+    item.discount_price = int(request.form.get("discount-price", "0"))
+    item.category_id = int(request.form.get("category", 1))
+
+    g.db.add(item)
+
+    cats = g.db.query(ShopCategory).options(lazyload('*')).all()
+
+    return render_template("shop/shop-edit.html", item=item, cats=cats, v=v)
+
+
 @app.get("/api/items/all")
 def shop_items_get():
 
