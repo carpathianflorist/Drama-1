@@ -261,9 +261,9 @@ function post(url, callback, errortext) {
 	xhr.send(form);
 };
 
-function post_toast(url, callback, data) {
+function request_toast(method, url, callback, data) {
 	var xhr = new XMLHttpRequest();
-	xhr.open("POST", url, true);
+	xhr.open(method, url, true);
 	var form = new FormData()
 
 	if(typeof data === 'object' && data !== null) {
@@ -307,7 +307,11 @@ function post_toast(url, callback, data) {
 
 		xhr.send(form);
 
-	}
+}
+
+function post_toast(url, callback, data) {
+	return request_toast("POST", url, callback, data);
+}
 
 
 // Search Icon
