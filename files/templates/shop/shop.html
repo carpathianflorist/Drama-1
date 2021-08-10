@@ -64,7 +64,7 @@
 			}
 		},
 		mounted() {
-			fetch('/api/items/all')
+			fetch('/api/items/all?with_featured')
 			.then(response => response.json())
 			.then(json => {
 				this.items = json;
