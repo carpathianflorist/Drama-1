@@ -1,60 +1,28 @@
 {% extends "shop/shop-layout.html" %}
 {% block content %}
+<div id="shop" class="col-md-9 mx-auto">
 
-<div class="container pt-5">
-	<div class="row">
-		<div class="col-3 d-none d-md-block">
-			<ul class="nav nav-pills flex-column mb-auto">
-				<li class="nav-item">
-					<a href="#" class="nav-link active" aria-current="page">
-						<i class="fas fa-star fa-fw mr-2"></i>
-						Featured
-					</a>
-				</li>
-				<li>
-					<a href="#" class="nav-link text-muted">
-						<i class="fas fa-sunglasses fa-fw mr-2"></i>
-						Profile Cosmetics
-					</a>
-				</li>
-				<li>
-					<a href="#" class="nav-link text-muted">
-						<i class="fas fa-bolt fa-fw mr-2"></i>
-						Special Abilities
-					</a>
-				</li>
-				<li>
-					<a href="#" class="nav-link text-muted">
-						<i class="fas fa-tag fa-fw mr-2"></i>
-						Summer Sale
-					</a>
-				</li>
-			</ul>
-		</div>
-
-		<div id="shop" class="col-md-9 mx-auto">
-
-			{% if v and v.admin_level == 6 %}
-			<div class="custom-control custom-switch">
-				<input type="checkbox" class="custom-control-input" id="toggle-settings" v-model="settings">
-				<label class="custom-control-label" for="toggle-settings">Show item settings</label>
-			</div>
-			{% endif %}
-
-			<!-- shop-header.html goes here -->
-			{% include "shop/shop-header.html" %}
-
-			<section class="container-fluid px-0 py-5">
-				<!-- shop-section.html goes here -->
-				{% include "shop/shop-section.html" %}
-				{#<div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center mt-3">
-					<!-- shop-item.html goes here -->
-					{% include "shop/shop-item.html" %}
-				</div>#}
-			</section>
-
-		</div>
+	{% if v and v.admin_level == 6 %}
+	<div class="custom-control custom-switch">
+		<input type="checkbox" class="custom-control-input" id="toggle-settings" v-model="settings">
+		<label class="custom-control-label" for="toggle-settings">Show item settings</label>
 	</div>
+	{% endif %}
+
+	<!-- shop-header.html goes here -->
+	{% include "shop/shop-header.html" %}
+
+	<section class="container-fluid px-0 py-5">
+		<!-- shop-section.html goes here -->
+		{% include "shop/shop-section.html" %}
+		{#
+		<div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center mt-3">
+			<!-- shop-item.html goes here -->
+			{% include "shop/shop-item.html" %}
+		</div>
+		#}
+	</section>
+
 </div>
 {% endblock %}
 

@@ -64,9 +64,42 @@
 
 			<div class="col h-100">
 
-				{% block content %}
-				{% endblock %}
+				<div class="container pt-5">
+					<div class="row">
+						<div class="col-3 d-none d-md-block">
+							<ul class="nav nav-pills flex-column mb-auto">
+								<li class="nav-item">
+									<a href="#" class="nav-link active" aria-current="page">
+										<i class="fas fa-star fa-fw mr-2"></i>
+										Featured
+									</a>
+								</li>
+								<li>
+									<a href="#" class="nav-link text-muted">
+										<i class="fas fa-sunglasses fa-fw mr-2"></i>
+										Profile Cosmetics
+									</a>
+								</li>
+								<li>
+									<a href="#" class="nav-link text-muted">
+										<i class="fas fa-bolt fa-fw mr-2"></i>
+										Special Abilities
+									</a>
+								</li>
+								<li>
+									<a href="#" class="nav-link text-muted">
+										<i class="fas fa-tag fa-fw mr-2"></i>
+										Summer Sale
+									</a>
+								</li>
+							</ul>
+						</div>
 
+						{% block content %}
+						{% endblock %}
+
+					</div>
+				</div>
 			</div>
 		</div>
 
