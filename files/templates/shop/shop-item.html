@@ -50,9 +50,9 @@
 		</div>
 		<ul class="nav nav-pills flex-column mb-auto mt-1">
 			<li class="nav-item">
-				<a href="#" class="nav-link text-muted" aria-current="page">
+				<a href="#" class="nav-link text-muted" aria-current="page" @click.prevent="feature(item)">
 					<i class="fas fa-star fa-fw mr-2"></i>
-					Toggle Featured
+					[[ item.featured ? 'Remove from Featured' : 'Add to Featured' ]]
 				</a>
 			</li>
 			<li class="nav-item">
