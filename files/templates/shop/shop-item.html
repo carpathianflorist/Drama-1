@@ -1,5 +1,9 @@
 <div v-for="(item, index) in cat.items" :key="index" class="card h-100 shadow-lg m-3" :class="{ disabled: item.cost > coins }">
 	<!-- Product tag -->
+	<div v-if="item.discount" class="badge bg-danger text-white position-absolute" style="top: -0.5rem; left: -0.5rem;z-index: 1;padding: 4px 6px;font-size: 0.875rem;">
+		On sale
+	</div>
+
 	<div v-if="item.new" class="badge bg-primary text-white position-absolute" style="top: -0.5rem; right: -0.5rem;z-index: 1;padding: 4px 6px;font-size: 0.875rem;">
 		NEW!
 	</div>
@@ -39,7 +43,10 @@
 	<div class="card-footer px-2 py-3 pt-0">
 		<div class="text-center font-weight-bold">
 			<i class="fas fa-diamond text-primary text-small fa-sm mr-2"></i>
-			[[ item.cost ]]
+			<span v-if="item.discount">
+				<del>[[ item.price ]]</del> [[ item.cost ]]
+			</span>
+			<span v-else>[[ item.cost ]]</span>
 		</div>
 	</div>
 	<!-- Product settings -->

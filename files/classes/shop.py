@@ -91,7 +91,9 @@ class ShopItemDef(Base):
             "description": self.description,
             "icon": self.icon_url,
             "cost": self.cost,
-            "discount": self.discount_price > 0,
+            "price": self.price,
+            "discount_price": self.discount_price,
+            "discount": self.discount_price > 0 and self.price > self.discount_price,
             "featured": self.featured,
             "new": self.new,
             "category_name": self.category.name

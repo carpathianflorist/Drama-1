@@ -22,7 +22,7 @@ def get_shop_item_edit(iid, v):
     if not item:
         abort(404)
 
-    cats = g.db.query(ShopCategory).options(lazyload('*')).all()
+    cats = g.db.query(ShopCategory).options(lazyload('*')).filter(ShopCategory.id != item.category_id).all()
 
     return render_template("shop/shop-edit.html", item=item, cats=cats, v=v)
 
@@ -48,7 +48,7 @@ def shop_item_edit(iid, v):
 
     g.db.add(item)
 
-    cats = g.db.query(ShopCategory).options(lazyload('*')).all()
+    cats = g.db.query(ShopCategory).options(lazyload('*')).filter(ShopCategory.id != item.category_id).all()
 
     return render_template("shop/shop-edit.html", item=item, cats=cats, v=v)
 
@@ -145,7 +145,7 @@ def toggle_item_featured(iid, v):
     if not item:
         return jsonify({"error": "You tried to feature an item that doesn't even exist. Please do better."}), 404
 
-    return_msg = f"{item.name} removed from featured" if item.featured else f"{item.name} is now featured"
+    return_msg = f"{item.name} removed from featured" if item.featured else f"{item.name} added to featured"
 
     item.featured = not item.featured
 
